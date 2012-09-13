@@ -1,4 +1,13 @@
 ## Interface: 11200
 ## Title: TankStats
 
+#TODO:
+#Choose active health bar (include magic EHs and normal HP)
+#Bar graph with random points showing hits taken?
+#Include crit %
+#Remember bar per mob type
+#Block only if you have a shield
+#Miss from defense skill
+
+
 tankstats.lua

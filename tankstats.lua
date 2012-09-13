@@ -1,11 +1,29 @@
 local function stats()
 
-	DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", GetDodgeChance()) .. "%");
-	DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", GetParryChance()) .. "%");
-	DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", GetBlockChance()) .. "%");
-
-
 	local enemyLevel = UnitLevel("player")
+	local levelDiff = enemyLevel - UnitLevel("player");
+	
+	local runningTotal = 0;
+	
+	--1: MISS
+	local baseDefense, armorDefense = UnitDefense("player");
+	local defDiff = baseDefense - (5*UnitLevel("player"));
+	local miss = 5 + .04*defDiff;
+	--miss = min( (compare with runningTotal, 100)
+	runningTotal = runningTotal + miss;
+	
+	local dodge = GetDodgeChance();
+	local parry = GetParryChance();
+	local block = GetBlockChance();
+	
+	DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", miss) .. "%");
+	DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", dodge) .. "%");
+	DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", parry) .. "%");
+	DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", block) .. "%");
+	
+	
+
+
 	local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor("player");
 	local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * enemyLevel);
 	local ACmultiplier = 1 / (1 - ACreduction);
