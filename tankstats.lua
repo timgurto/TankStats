@@ -1,3 +1,13 @@
+--HIT TABLE:
+--Miss
+--Dodge
+--Parry
+--Block
+--Critical Hit
+--Crushing Blow
+--Hit
+
+
 local function stats()
 
 	local enemyLevel = UnitLevel("player")
