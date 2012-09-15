@@ -7,11 +7,40 @@
 --Crushing Blow
 --Hit
 
+TankStats = {}
 
-local function stats()
 
-    local enemyLevel = UnitLevel("player")
-    local levelDiff = enemyLevel - UnitLevel("player");
+local EventFrame = CreateFrame("Frame")
+
+EventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnLoad();
+end);
+
+EventFrame:RegisterEvent("UNIT_HEALTH")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnUpdate();
+end);
+
+EventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnUpdate();
+end);
+
+
+function TankStats:updateTargetLevel()
+    TankStats.enemyLevel = UnitLevel("target");
+    if (TankStats.enemyLevel == 0) then
+        TankStats.enemyLevel = UnitLevel("player")
+    end
+end
+
+
+function TankStats:stats()
+    TankStats:EHBar_OnUpdate();
+
+    TankStats:updateTargetLevel();
+    local levelDiff = TankStats.enemyLevel - UnitLevel("player");
     
     local runningTotal = 0;
     
@@ -30,18 +59,21 @@ local function stats()
     DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", dodge) .. "%");
     DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", parry) .. "%");
     DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", block) .. "%");
-    
-    
 
 
     local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor("player");
-    local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * enemyLevel);
+    local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel);
     local ACmultiplier = 1 / (1 - ACreduction);
     --DEFAULT_CHAT_FRAME:AddMessage("Armor: " .. effectiveArmor .. " (" .. format("%.1f", ACreduction*100) .. "% reduction)");
     local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
     --DEFAULT_CHAT_FRAME:AddMessage("HP: " .. health .. "/" .. maxHealth);
     local EH, maxEH = health*ACmultiplier, maxHealth*ACmultiplier;
-    DEFAULT_CHAT_FRAME:AddMessage("EH: " .. format("%d", EH) .. "/" .. format("%d", maxEH));
+    
+    EHFrameEHBar:SetMinMaxValues(0, maxEH);
+    EHFrameEHBar:SetValue(EH);
+    EHFrameEHBarText:SetText(format("%.1f", EH) .. " / " .. format("%.1f", maxEH));
+    
+    
 
     local maxResist = UnitLevel("player") * 5;
 
@@ -60,11 +92,42 @@ local function stats()
 
     base, total, bonus, minus = UnitResistance("player", 6);
     local arcaneMultiplier = 1 / (1 - total / maxResist);
-
-    --DEFAULT_CHAT_FRAME:AddMessage("Fire EH: " .. format("%d", fireEH) .. "/" .. format("%d", fireMaxEH));
     
+end
+
+function TankStats:EHBar_OnLoad()
+    TankStats:EHBar_OnUpdate();
+end
+
+function TankStats:EHBar_OnUpdate()
+    TankStats:updateTargetLevel();
+
+    local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor("player");
+    local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel);
+    local ACmultiplier = 1 / (1 - ACreduction);
+    --DEFAULT_CHAT_FRAME:AddMessage("Armor: " .. effectiveArmor .. " (" .. format("%.1f", ACreduction*100) .. "% reduction)");
+    local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
+    --DEFAULT_CHAT_FRAME:AddMessage("HP: " .. health .. "/" .. maxHealth);
+    local EH, maxEH = health*ACmultiplier, maxHealth*ACmultiplier;
+    
+    EHFrameEHBar:SetMinMaxValues(0, maxEH);
+    EHFrameEHBar:SetValue(EH);
+    EHFrameEHBarText:SetText(format("%.1f", EH) .. " / " .. format("%.1f", maxEH));
 end
 
 SLASH_TANKSTATS1 = "/stats";
 
-SlashCmdList["TANKSTATS"] = stats;
+SlashCmdList["TANKSTATS"] = TankStats.stats;
+
+
+
+
+
+
+
+
+
+
+
+
+

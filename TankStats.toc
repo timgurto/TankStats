@@ -2,5 +2,5 @@
 ## Title: TankStats
 ## Author: Timetheos/Garrmageddon/Archon
 
-tankstats.lua
 TankStats.xml
+tankstats.lua
