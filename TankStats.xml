@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
     
     <Frame name="EHFrame" parent="UIParent" enableMouse="true" movable="true" clampedToScreen="true">
-        <Size x="200" y="15"/>
+        <Size x="400" y="30"/>
         <Anchors>
             <Anchor point="CENTER"/>
         </Anchors>
@@ -15,17 +15,17 @@
                         <Offset x="0" y="0"/>
                     </Anchor>
                 </Anchors>
-                <Size x="200" y="15"/>
+                <Size x="400" y="30"/>
               
                 <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
-                <BarColor r="0.25" g="0.25" b="0.25" a="1"/>
+                <BarColor r="1" g="0" b="0" a="1"/>
             </StatusBar>
             <StatusBar name="$parentEHBar" parentKey="EHBar">
                 <Anchors>
                     <Anchor point="TOPLEFT"/>
                     <Anchor point="BOTTOMRIGHT"/>
                 </Anchors>
-                <Size x="200" y="15"/>
+                <Size x="400" y="30"/>
                 <Layers>
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="80 / 100" minValue="0" maxValue="100" value="80">
@@ -39,7 +39,7 @@
                 </Layers>
            
                 <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
-                <BarColor r="1.0" g="0.0" b="0.0" a="1"/>
+                <BarColor r=".25" g="1.0" b=".25" a="1"/>
             </StatusBar>
         </Frames>
     </Frame>
