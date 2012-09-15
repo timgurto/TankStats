@@ -1,0 +1,61 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    
+    <!--
+    <Frame name="Square" parent="UIParent">
+        <Size x="100" y="100"/>
+        <Anchors>
+            <Anchor point="CENTER" relativePoint="CENTER" relativeTo="UIParent"/>
+        </Anchors>
+        <Layers>
+            <Layer level="BACKGROUND" setAllPoints = "true">
+                <Texture file="Interface\BankFrame\UI-BankFrame-TopRight" >
+                    <Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+    -->
+    
+    <Frame name="BarTest" parent="UIParent">
+        <Size x="100" y="100"/>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="MIDDLE">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset x="3" y="1"/>
+						</Anchor>									
+					</Anchors>
+				</FontString>				
+			</Layer>
+		</Layers>	
+        <Frames>
+			<StatusBar name="$parentMiss">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="CENTER">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset x="0" y="0"/>
+								</Anchor>									
+							</Anchors>
+						</FontString>				
+					</Layer>
+				</Layers>				
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="1.0" g="0.0" b="0.0" a="0.5"/>
+			</StatusBar>
+        </Frames>
+    </Frame>
+    
+</Ui>
