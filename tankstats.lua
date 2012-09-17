@@ -59,19 +59,9 @@ function TankStats:stats()
     DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", dodge) .. "%");
     DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", parry) .. "%");
     DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", block) .. "%");
+	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
+	
 
-
-    local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor("player");
-    local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel);
-    local ACmultiplier = 1 / (1 - ACreduction);
-    --DEFAULT_CHAT_FRAME:AddMessage("Armor: " .. effectiveArmor .. " (" .. format("%.1f", ACreduction*100) .. "% reduction)");
-    local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
-    --DEFAULT_CHAT_FRAME:AddMessage("HP: " .. health .. "/" .. maxHealth);
-    local EH, maxEH = health*ACmultiplier, maxHealth*ACmultiplier;
-    
-    EHFrameEHBar:SetMinMaxValues(0, maxEH);
-    EHFrameEHBar:SetValue(EH);
-    EHFrameEHBarText:SetText(format("%.1f", EH) .. " / " .. format("%.1f", maxEH));
     
     
 
@@ -99,20 +89,113 @@ function TankStats:EHBar_OnLoad()
     TankStats:EHBar_OnUpdate();
 end
 
+local function formatEH(x)
+	if (x < 1000) then
+		return format("%.1f", x);
+	end
+	
+	return format("%3fk", x/1000);
+end
+
 function TankStats:EHBar_OnUpdate()
     TankStats:updateTargetLevel();
 
+	--Physical
     local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor("player");
     local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel);
     local ACmultiplier = 1 / (1 - ACreduction);
-    --DEFAULT_CHAT_FRAME:AddMessage("Armor: " .. effectiveArmor .. " (" .. format("%.1f", ACreduction*100) .. "% reduction)");
     local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
-    --DEFAULT_CHAT_FRAME:AddMessage("HP: " .. health .. "/" .. maxHealth);
     local EH, maxEH = health*ACmultiplier, maxHealth*ACmultiplier;
-    
+	
     EHFrameEHBar:SetMinMaxValues(0, maxEH);
     EHFrameEHBar:SetValue(EH);
-    EHFrameEHBarText:SetText(format("%.1f", EH) .. " / " .. format("%.1f", maxEH));
+    EHFrameEHBarText:SetText("Physical: " ..
+							 formatEH(EH) ..
+	                         " / " ..
+							 formatEH(maxEH));
+							 
+	--Resists
+    local maxResist = TankStats.enemyLevel * 5;
+	local base, total, bonus, minus, modWidth;
+
+	
+	--Fire EH
+    base, total, bonus, minus = UnitResistance("player", 2);
+    local fireMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
+    local fireEH, maxFireEH = health*fireMultiplier, maxHealth*fireMultiplier;
+	
+    EHFrameFireEHBar:SetMinMaxValues(0, maxFireEH);
+    EHFrameFireEHBar:SetValue(fireEH);
+    EHFrameFireEHBarText:SetText("Fire: " ..
+	                             formatEH(fireEH) ..
+	                             " / " ..
+							     formatEH(maxFireEH));
+							 
+	--Shadow EH
+    base, total, bonus, minus = UnitResistance("player", 5);
+    local shadowMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
+    local shadowEH, maxShadowEH = health*shadowMultiplier, maxHealth*shadowMultiplier;
+	
+    EHFrameShadowEHBar:SetMinMaxValues(0, maxShadowEH);
+    EHFrameShadowEHBar:SetValue(shadowEH);
+    EHFrameShadowEHBarText:SetText("Shadow: " ..
+	                               formatEH(shadowEH) ..
+								   " / " ..
+							       formatEH(maxShadowEH));
+							 
+	--Nature EH
+    base, total, bonus, minus = UnitResistance("player", 3);
+    local natureMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
+    local natureEH, maxNatureEH = health*natureMultiplier, maxHealth*natureMultiplier;
+	
+    EHFrameNatureEHBar:SetMinMaxValues(0, maxNatureEH);
+    EHFrameNatureEHBar:SetValue(natureEH);
+    EHFrameNatureEHBarText:SetText("Nature: " ..
+	                               formatEH(natureEH) ..
+								   " / " ..
+								   formatEH(maxNatureEH));
+							 
+	--Frost EH
+    base, total, bonus, minus = UnitResistance("player", 4);
+    local frostMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
+    local frostEH, maxFrostEH = health*frostMultiplier, maxHealth*frostMultiplier;
+	
+    EHFrameFrostEHBar:SetMinMaxValues(0, maxFrostEH);
+    EHFrameFrostEHBar:SetValue(frostEH);
+    EHFrameFrostEHBarText:SetText("Frost: " ..
+	                               formatEH(frostEH) ..
+								   " / " ..
+								   formatEH(maxFrostEH));
+							 
+	--Arcane EH
+    base, total, bonus, minus = UnitResistance("player", 6);
+    local arcaneMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
+    local arcaneEH, maxArcaneEH = health*arcaneMultiplier, maxHealth*arcaneMultiplier;
+	
+    EHFrameArcaneEHBar:SetMinMaxValues(0, maxArcaneEH);
+    EHFrameArcaneEHBar:SetValue(arcaneEH);
+    EHFrameArcaneEHBarText:SetText("Arcane: " ..
+	                               formatEH(arcaneEH) ..
+								   " / " ..
+								   formatEH(maxArcaneEH));
+							 
+
+	--Normalize bar widths
+	local maxMax = max(maxEH, maxFireEH, maxShadowEH, maxNatureEH, maxFrostEH, maxArcaneEH);
+	local widthModifier = EHFrame:GetWidth() / maxMax;
+	EHFrameMaxEHBar:SetWidth(maxEH * widthModifier);
+	EHFrameEHBar:SetWidth(maxEH * widthModifier);
+	EHFrameMaxFireEHBar:SetWidth(maxFireEH * widthModifier);
+	EHFrameFireEHBar:SetWidth(maxFireEH * widthModifier);
+	EHFrameMaxShadowEHBar:SetWidth(maxShadowEH * widthModifier);
+	EHFrameShadowEHBar:SetWidth(maxShadowEH * widthModifier);
+	EHFrameMaxNatureEHBar:SetWidth(maxNatureEH * widthModifier);
+	EHFrameNatureEHBar:SetWidth(maxNatureEH * widthModifier);
+	EHFrameMaxFrostEHBar:SetWidth(maxFrostEH * widthModifier);
+	EHFrameFrostEHBar:SetWidth(maxFrostEH * widthModifier);
+	EHFrameMaxArcaneEHBar:SetWidth(maxArcaneEH * widthModifier);
+	EHFrameArcaneEHBar:SetWidth(maxArcaneEH * widthModifier);
+	
 end
 
 SLASH_TANKSTATS1 = "/stats";
