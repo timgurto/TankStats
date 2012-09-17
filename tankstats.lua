@@ -94,7 +94,11 @@ local function formatEH(x)
 		return format("%.1f", x);
 	end
 	
-	return format("%3fk", x/1000);
+	if (x < 10000) then
+		return format("%d", x);
+	end
+	
+	return format("%.3fk", x/1000);
 end
 
 function TankStats:EHBar_OnUpdate()
@@ -183,6 +187,7 @@ function TankStats:EHBar_OnUpdate()
 	--Normalize bar widths
 	local maxMax = max(maxEH, maxFireEH, maxShadowEH, maxNatureEH, maxFrostEH, maxArcaneEH);
 	local widthModifier = EHFrame:GetWidth() / maxMax;
+	
 	EHFrameMaxEHBar:SetWidth(maxEH * widthModifier);
 	EHFrameEHBar:SetWidth(maxEH * widthModifier);
 	EHFrameMaxFireEHBar:SetWidth(maxFireEH * widthModifier);
