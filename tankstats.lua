@@ -61,27 +61,6 @@ function TankStats:stats()
     DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", block) .. "%");
 	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
 	
-
-    
-    
-
-    local maxResist = UnitLevel("player") * 5;
-
-    local base, total, bonus, minus = UnitResistance("player", 2);
-    local fireMultiplier = 1 / (1 - total / maxResist);
-    local fireEH, fireMaxEH = health*fireMultiplier, maxHealth*fireMultiplier
-
-    base, total, bonus, minus = UnitResistance("player", 3);
-    local natureMultiplier = 1 / (1 - total / maxResist);
-
-    base, total, bonus, minus = UnitResistance("player", 4);
-    local frostMultiplier = 1 / (1 - total / maxResist);
-
-    base, total, bonus, minus = UnitResistance("player", 5);
-    local shadowMultiplier = 1 / (1 - total / maxResist);
-
-    base, total, bonus, minus = UnitResistance("player", 6);
-    local arcaneMultiplier = 1 / (1 - total / maxResist);
     
 end
 
