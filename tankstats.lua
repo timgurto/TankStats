@@ -30,9 +30,17 @@ end);
 
 function TankStats:updateTargetLevel()
     TankStats.enemyLevel = UnitLevel("target");
-    if (TankStats.enemyLevel == 0) then
+    
+	--0: nothing selected; use player
+	if (TankStats.enemyLevel == 0) then
         TankStats.enemyLevel = UnitLevel("player")
     end
+	
+	---1: skull; use 63
+	if (TankStats.enemyLevel == -1) then
+		--TankStats.enemyLevel = UnitLevel("player") + 3;
+		--TankStats.enemyLevel = 63;
+	end
 end
 
 
