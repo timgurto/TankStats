@@ -7,20 +7,8 @@
         <Anchors>
             <Anchor point="CENTER"/>
         </Anchors>
-        <TitleRegion setAllPoints="true"/>   
+		<TitleRegion setAllPoints="true"/>
         <Frames>
-			<!-- Background; remove later. -->
-            <!--
-			<StatusBar name="frameBG" frameLevel="1">
-                <Anchors>
-                    <Anchor point="TOPLEFT"/>
-                    <Anchor point="BOTTOMRIGHT"/>
-                </Anchors>
-              
-                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
-                <BarColor r="1" g="1" b="1" a="0.4"/>
-            </StatusBar>
-			-->
 			
 			<!-- EH -->
             <StatusBar name="$parentMaxEHBar"  parentKey="MaxEHBar" frameLevel="2">
@@ -195,6 +183,95 @@
                 <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
                 <BarColor r="0" g=".47" b=".47" a="1"/>
             </StatusBar>
+			
+        </Frames>
+    </Frame>
+    
+    <Frame name="HitTable" parent="UIParent" enableMouse="true" movable="true" clampedToScreen="true">
+        <Size x="300" y="20"/>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+		<TitleRegion setAllPoints="true"/>
+        <Frames>
+			
+			<!-- Miss -->
+            <StatusBar name="$parentMissBar"  parentKey="MissBar" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0" g="1" b="0" a="1"/>
+            </StatusBar>
+			
+			<!-- Dodge -->
+            <StatusBar name="$parentDodgeBar"  parentKey="DodgeBar" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMissBar"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0" g="1" b="0" a="1"/>
+            </StatusBar>
+			
+			<!-- Parry -->
+            <StatusBar name="$parentParryBar"  parentKey="ParryBar" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentDodgeBar"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0" g="1" b="0" a="1"/>
+            </StatusBar>
+			
+			<!-- Block -->
+            <StatusBar name="$parentBlockBar"  parentKey="BlockBar" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentParryBar"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="1" g="1" b="0" a="1"/>
+            </StatusBar>
+			
+			<!-- Crit -->
+            <StatusBar name="$parentCritBar"  parentKey="CritBar" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentBlockBar"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0.3" g="0" b="0" a="1"/>
+            </StatusBar>
+			
+			<!-- Crush -->
+            <StatusBar name="$parentCrushBar"  parentKey="Crush" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentCritBar"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0.3" g="0" b="0" a="1"/>
+            </StatusBar>
+			
+			<!-- Hit -->
+            <StatusBar name="$parentHitBar"  parentKey="HitBar" frameLevel="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentCrushBar"/>
+                </Anchors>
+                <Size x="30" y="20"/>
+              
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="1" g="0" b="0" a="1"/>
+            </StatusBar>
+			
 			
         </Frames>
     </Frame>

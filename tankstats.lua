@@ -17,14 +17,38 @@ EventFrame:SetScript("OnEvent", function(self,event,...)
     TankStats:EHBar_OnLoad();
 end);
 
+
+EventFrame:RegisterEvent("UNIT_RESISTANCES")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnUpdate();
+end);
+
 EventFrame:RegisterEvent("UNIT_HEALTH")
 EventFrame:SetScript("OnEvent", function(self,event,...) 
     TankStats:EHBar_OnUpdate();
 end);
 
+EventFrame:RegisterEvent("UNIT_DEFENSE")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+	TankStats:HitTable_OnUpdate();
+end);
+
 EventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 EventFrame:SetScript("OnEvent", function(self,event,...) 
     TankStats:EHBar_OnUpdate();
+	TankStats:HitTable_OnUpdate();
+end);
+
+EventFrame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnUpdate();
+	TankStats:HitTable_OnUpdate();
+end);
+
+EventFrame:RegisterEvent("UNIT_STATS")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnUpdate();
+	TankStats:HitTable_OnUpdate();
 end);
 
 
@@ -47,21 +71,7 @@ end
 function TankStats:stats()
     TankStats:EHBar_OnUpdate();
 
-    TankStats:updateTargetLevel();
-    local levelDiff = TankStats.enemyLevel - UnitLevel("player");
-    
-    local runningTotal = 0;
-    
-    --1: MISS
-    local baseDefense, armorDefense = UnitDefense("player");
-    local defDiff = baseDefense - (5*UnitLevel("player"));
-    local miss = 5 + .04*defDiff;
-    --miss = min( (compare with runningTotal, 100)
-    runningTotal = runningTotal + miss;
-    
-    local dodge = GetDodgeChance();
-    local parry = GetParryChance();
-    local block = GetBlockChance();
+
     
     DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", miss) .. "%");
     DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", dodge) .. "%");
@@ -74,6 +84,7 @@ end
 
 function TankStats:EHBar_OnLoad()
     TankStats:EHBar_OnUpdate();
+	TankStats:HitTable_OnUpdate();
 end
 
 local function formatEH(x)
@@ -187,6 +198,37 @@ function TankStats:EHBar_OnUpdate()
 	EHFrameFrostEHBar:SetWidth(maxFrostEH * widthModifier);
 	EHFrameMaxArcaneEHBar:SetWidth(maxArcaneEH * widthModifier);
 	EHFrameArcaneEHBar:SetWidth(maxArcaneEH * widthModifier);
+	
+end
+
+function TankStats:HitTable_OnUpdate()
+    TankStats:updateTargetLevel();
+    local levelDiff = TankStats.enemyLevel - UnitLevel("player");
+    
+    --1: MISS
+    local baseDefense, armorDefense = UnitDefense("player");
+    local defDiff = baseDefense - (5*UnitLevel("player"));
+    local miss = 5 + .04*defDiff;
+    
+    local dodge = GetDodgeChance();
+    local parry = GetParryChance();
+    local block = GetBlockChance();
+	
+	local crit = 10;
+	local crush = 1;
+	
+	local hit = max(0, 100 - miss - dodge - parry - block - crit - crush)
+	
+	local barSize = HitTable:GetWidth() * .01;
+	
+	HitTableMissBar:SetWidth(miss * barSize);
+	HitTableDodgeBar:SetWidth(dodge * barSize);
+	HitTableParryBar:SetWidth(parry * barSize);
+	HitTableBlockBar:SetWidth(block * barSize);
+	HitTableCritBar:SetWidth(crit * barSize);
+	HitTableCrushBar:SetWidth(crush * barSize);
+	HitTableHitBar:SetWidth(hit * barSize);
+	
 	
 end
 
