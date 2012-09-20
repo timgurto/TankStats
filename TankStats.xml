@@ -188,14 +188,22 @@
     </Frame>
     
     <Frame name="HitTable" parent="UIParent" enableMouse="true" movable="true" clampedToScreen="true">
-        <Size x="300" y="20"/>
+        <Size x="450" y="20"/>
         <Anchors>
             <Anchor point="CENTER"/>
         </Anchors>
+		<Scripts>
+			<OnEnter>
+				TankStats:showHitTableText();
+			</OnEnter>
+			<OnLeave>
+				TankStats:hideHitTableText();
+			</OnLeave>
+		</Scripts>
 		<Layers>
 			<Layer level="OVERLAY">
 				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE"
-				text="M D P B Ct Cu H">
+				text="">
 					<Anchors>
 						<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="HitTable"/>
 					</Anchors>

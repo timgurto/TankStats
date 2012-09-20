@@ -191,18 +191,18 @@ function TankStats:HitTable_OnUpdate()
     local levelDiff = TankStats.enemyLevel - UnitLevel("player");
 	local extraFromLevel = levelDiff * -0.02;
     
-    --1: MISS
     local baseDefense, armorDefense = UnitDefense("player");
     local defDiff = baseDefense - (5*UnitLevel("player"));
+	
     TankStats.miss = 5 + .04*defDiff + extraFromLevel;
     
     TankStats.dodge = GetDodgeChance() + extraFromLevel;
     TankStats.parry = GetParryChance() + extraFromLevel;
     TankStats.block = GetBlockChance() + extraFromLevel;
 	
-	TankStats.crit = 10;
+	TankStats.crit = max(0, 5 - extraFromLevel - 0.4*defDiff);
 	
-	TankStats.crush = max(0, (TankStats.enemyLevel * 5 - min(baseDefense, 300)) * 2 - 15);
+	TankStats.crush = max(0, (TankStats.enemyLevel * 5 - min(baseDefense, 5*UnitLevel("player"))) * 2 - 15);
 	
 	
 	TankStats.miss  = min(TankStats.miss,  100);
@@ -220,7 +220,7 @@ function TankStats:HitTable_OnUpdate()
 	if (TankStats.dodge > 0) then HitTableDodgeBarText:SetText("D"); else HitTableDodgeBarText:SetText(""); end
 	if (TankStats.parry > 0) then HitTableParryBarText:SetText("P"); else HitTableParryBarText:SetText(""); end
 	if (TankStats.block > 0) then HitTableBlockBarText:SetText("B"); else HitTableBlockBarText:SetText(""); end
-	if (TankStats.crit > 0) then HitTableCritBarText:SetText("Ct"); else HitTableCritBarText:SetText(""); end
+	if (TankStats.crit > 0) then HitTableCritBarText:SetText("C"); else HitTableCritBarText:SetText(""); end
 	if (TankStats.crush > 0) then HitTableCrushBarText:SetText("Cu"); else HitTableCrushBarText:SetText(""); end
 	if (TankStats.hit > 0) then HitTableHitBarText:SetText("H"); else HitTableHitBarText:SetText(""); end
 	
@@ -241,7 +241,14 @@ function TankStats:HitTable_OnUpdate()
 	HitTableCrushBar:SetWidth(crushSize * barSize);
 	HitTableHitBar:SetWidth(hitSize * barSize);
 	
-	
+	TankStats.summaryText = "";
+	if (TankStats.miss > 0) then TankStats.summaryText = TankStats.summaryText .. format("%.2f", TankStats.miss) .. "% miss" end
+	if (TankStats.dodge > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.dodge) .. "% dodge" end
+	if (TankStats.parry > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.parry) .. "% parry" end
+	if (TankStats.block > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.block) .. "% block" end
+	if (TankStats.crit > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.crit) .. "% crit" end
+	if (TankStats.crush > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.crush) .. "% crush" end
+	if (TankStats.hit > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.hit) .. "% hit" end
 end
 
 
@@ -252,15 +259,23 @@ function TankStats:stats()
     
 	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
 	
-    DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", TankStats.miss) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", TankStats.dodge) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", TankStats.parry) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", TankStats.block) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Crit: " .. format("%.2f", TankStats.crit) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Hit: " .. format("%.2f", TankStats.hit) .. "%");
+    if (TankStats.miss > 0) then DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", TankStats.miss) .. "%"); end
+    if (TankStats.dodge > 0) then DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", TankStats.dodge) .. "%"); end
+    if (TankStats.parry > 0) then DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", TankStats.parry) .. "%"); end
+    if (TankStats.block > 0) then DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", TankStats.block) .. "%"); end
+    if (TankStats.crit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crit: " .. format("%.2f", TankStats.crit) .. "%"); end
+    if (TankStats.crush > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%"); end
+    if (TankStats.hit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Hit: " .. format("%.2f", TankStats.hit) .. "%"); end
 
     
+end
+
+function TankStats:showHitTableText()	
+	HitTableText:SetText(TankStats.summaryText);
+end
+
+function TankStats:hideHitTableText()
+	HitTableText:SetText("");
 end
 
 
