@@ -67,21 +67,6 @@ function TankStats:updateTargetLevel()
 	end
 end
 
-
-function TankStats:stats()
-    TankStats:EHBar_OnUpdate();
-
-
-    
-    DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", miss) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", dodge) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", parry) .. "%");
-    DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", block) .. "%");
-	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
-	
-    
-end
-
 function TankStats:EHBar_OnLoad()
     TankStats:EHBar_OnUpdate();
 	TankStats:HitTable_OnUpdate();
@@ -204,40 +189,84 @@ end
 function TankStats:HitTable_OnUpdate()
     TankStats:updateTargetLevel();
     local levelDiff = TankStats.enemyLevel - UnitLevel("player");
+	local extraFromLevel = levelDiff * -0.02;
     
     --1: MISS
     local baseDefense, armorDefense = UnitDefense("player");
     local defDiff = baseDefense - (5*UnitLevel("player"));
-    local miss = 5 + .04*defDiff;
+    TankStats.miss = 5 + .04*defDiff + extraFromLevel;
     
-    local dodge = GetDodgeChance();
-    local parry = GetParryChance();
-    local block = GetBlockChance();
+    TankStats.dodge = GetDodgeChance() + extraFromLevel;
+    TankStats.parry = GetParryChance() + extraFromLevel;
+    TankStats.block = GetBlockChance() + extraFromLevel;
 	
-	local crit = 10;
-	local crush = 1;
+	TankStats.crit = 10;
 	
-	local hit = max(0, 100 - miss - dodge - parry - block - crit - crush)
+	TankStats.crush = max(0, (TankStats.enemyLevel * 5 - min(baseDefense, 300)) * 2 - 15);
+	
+	
+	TankStats.miss  = min(TankStats.miss,  100);
+	TankStats.dodge = min(TankStats.dodge, 100 - TankStats.miss);
+	TankStats.parry = min(TankStats.parry, 100 - TankStats.miss - TankStats.dodge);
+	TankStats.block = min(TankStats.block, 100 - TankStats.miss - TankStats.dodge - TankStats.parry);
+	TankStats.crit  = min(TankStats.crit , 100 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block);
+	TankStats.crush = min(TankStats.crush, 100 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit);
+	TankStats.hit   =                      100 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit - TankStats.crush;
+	
 	
 	local barSize = HitTable:GetWidth() * .01;
 	
-	HitTableMissBar:SetWidth(miss * barSize);
-	HitTableDodgeBar:SetWidth(dodge * barSize);
-	HitTableParryBar:SetWidth(parry * barSize);
-	HitTableBlockBar:SetWidth(block * barSize);
-	HitTableCritBar:SetWidth(crit * barSize);
-	HitTableCrushBar:SetWidth(crush * barSize);
-	HitTableHitBar:SetWidth(hit * barSize);
+	if (TankStats.miss > 0) then HitTableMissBarText:SetText("M"); else HitTableMissBarText:SetText(""); end
+	if (TankStats.dodge > 0) then HitTableDodgeBarText:SetText("D"); else HitTableDodgeBarText:SetText(""); end
+	if (TankStats.parry > 0) then HitTableParryBarText:SetText("P"); else HitTableParryBarText:SetText(""); end
+	if (TankStats.block > 0) then HitTableBlockBarText:SetText("B"); else HitTableBlockBarText:SetText(""); end
+	if (TankStats.crit > 0) then HitTableCritBarText:SetText("Ct"); else HitTableCritBarText:SetText(""); end
+	if (TankStats.crush > 0) then HitTableCrushBarText:SetText("Cu"); else HitTableCrushBarText:SetText(""); end
+	if (TankStats.hit > 0) then HitTableHitBarText:SetText("H"); else HitTableHitBarText:SetText(""); end
+	
+	--zero-size messes up anchors
+	local missSize = max(0.01, TankStats.miss);
+	local dodgeSize = max(0.01, TankStats.dodge);
+	local parrySize = max(0.01, TankStats.parry);
+	local blockSize = max(0.01, TankStats.block);
+	local critSize = max(0.01, TankStats.crit);
+	local crushSize = max(0.01, TankStats.crush);
+	local hitSize = max(0.01, TankStats.hit);
+	
+	HitTableMissBar:SetWidth(missSize * barSize);
+	HitTableDodgeBar:SetWidth(dodgeSize * barSize);
+	HitTableParryBar:SetWidth(parrySize * barSize);
+	HitTableBlockBar:SetWidth(blockSize * barSize);
+	HitTableCritBar:SetWidth(critSize * barSize);
+	HitTableCrushBar:SetWidth(crushSize * barSize);
+	HitTableHitBar:SetWidth(hitSize * barSize);
 	
 	
 end
 
+
+function TankStats:stats()
+    TankStats:HitTable_OnUpdate();
+
+
+    
+	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
+	
+    DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", TankStats.miss) .. "%");
+    DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", TankStats.dodge) .. "%");
+    DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", TankStats.parry) .. "%");
+    DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", TankStats.block) .. "%");
+    DEFAULT_CHAT_FRAME:AddMessage("Crit: " .. format("%.2f", TankStats.crit) .. "%");
+    DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%");
+    DEFAULT_CHAT_FRAME:AddMessage("Hit: " .. format("%.2f", TankStats.hit) .. "%");
+
+    
+end
+
+
 SLASH_TANKSTATS1 = "/stats";
 
 SlashCmdList["TANKSTATS"] = TankStats.stats;
-
-
-
 
 
 
