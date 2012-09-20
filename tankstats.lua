@@ -62,6 +62,7 @@ function TankStats:updateTargetLevel()
 	
 	---1: skull; use 63
 	if (TankStats.enemyLevel == -1) then
+		TankStats.enemyLevel = min(63, UnitLevel("player") + 10);
 		--TankStats.enemyLevel = UnitLevel("player") + 3;
 		--TankStats.enemyLevel = 63;
 	end
@@ -188,19 +189,23 @@ end
 
 function TankStats:HitTable_OnUpdate()
     TankStats:updateTargetLevel();
-    local levelDiff = TankStats.enemyLevel - UnitLevel("player");
-	local extraFromLevel = levelDiff * -0.02;
-    
     local baseDefense, armorDefense = UnitDefense("player");
-    local defDiff = baseDefense - (5*UnitLevel("player"));
+    local levelDiff = TankStats.enemyLevel - UnitLevel("player");
+	local extraFromLevel = -0.04 * (TankStats.enemyLevel*5 - baseDefense);
+    
 	
-    TankStats.miss = 5 + .04*defDiff + extraFromLevel;
+    TankStats.miss = 5 + extraFromLevel;
     
     TankStats.dodge = GetDodgeChance() + extraFromLevel;
     TankStats.parry = GetParryChance() + extraFromLevel;
     TankStats.block = GetBlockChance() + extraFromLevel;
+	TankStats.crit = max(0, 5 - extraFromLevel);
 	
-	TankStats.crit = max(0, 5 - extraFromLevel - 0.4*defDiff);
+	--shield?
+	if (UnitCreatureType("target") == "Elemental") then
+		TankStats.block = 0;
+	end
+
 	
 	TankStats.crush = max(0, (TankStats.enemyLevel * 5 - min(baseDefense, 5*UnitLevel("player"))) * 2 - 15);
 	
@@ -249,6 +254,15 @@ function TankStats:HitTable_OnUpdate()
 	if (TankStats.crit > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.crit) .. "% crit" end
 	if (TankStats.crush > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.crush) .. "% crush" end
 	if (TankStats.hit > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.hit) .. "% hit" end
+	TankStats.summaryText = TankStats.summaryText .. "  (from lvl " .. TankStats.enemyLevel .. " target)";
+end
+
+function TankStats:showHitTableText()	
+	HitTableText:SetText(TankStats.summaryText);
+end
+
+function TankStats:hideHitTableText()
+	HitTableText:SetText("");
 end
 
 
@@ -267,15 +281,10 @@ function TankStats:stats()
     if (TankStats.crush > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%"); end
     if (TankStats.hit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Hit: " .. format("%.2f", TankStats.hit) .. "%"); end
 
-    
-end
-
-function TankStats:showHitTableText()	
-	HitTableText:SetText(TankStats.summaryText);
-end
-
-function TankStats:hideHitTableText()
-	HitTableText:SetText("");
+	
+    local id, texture, checkRelic = GetInventorySlotInfo("MainHandSlot");
+	local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(id);
+	DEFAULT_CHAT_FRAME:AddMessage("Offhand name: " .. id);
 end
 
 
