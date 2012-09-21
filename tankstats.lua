@@ -201,10 +201,25 @@ function TankStats:HitTable_OnUpdate()
     TankStats.block = GetBlockChance() + extraFromLevel;
 	TankStats.crit = max(0, 5 - extraFromLevel);
 	
-	--shield?
-	if (UnitCreatureType("target") == "Elemental") then
+	--ignore block?
+	local hasOH = true;
+	local link = GetInventoryItemLink("player", 17);
+	if (link == nil) then
+		hasOH = false;
 		TankStats.block = 0;
+		DEFAULT_CHAT_FRAME:AddMessage("Link is nil");
+	else
+		local _,_, itemId = string.find(link, "item:(%d+):");
+		local _, _, _, _, _, sSubType, _ = GetItemInfo(itemId);
+		DEFAULT_CHAT_FRAME:AddMessage("Subtype: " .. sSubType);
+		if (sSubType ~="Shields") then
+			TankStats.block = 0;
+		end
 	end
+	
+	--if (UnitCreatureType("target") == "Elemental") then
+	--	TankStats.block = 0;
+	--end
 
 	
 	TankStats.crush = max(0, (TankStats.enemyLevel * 5 - min(baseDefense, 5*UnitLevel("player"))) * 2 - 15);
@@ -255,36 +270,34 @@ function TankStats:HitTable_OnUpdate()
 	if (TankStats.crush > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.crush) .. "% crush" end
 	if (TankStats.hit > 0) then TankStats.summaryText = TankStats.summaryText .. " | " .. format("%.2f", TankStats.hit) .. "% hit" end
 	TankStats.summaryText = TankStats.summaryText .. "  (from lvl " .. TankStats.enemyLevel .. " target)";
+	
+	if (TankStats.showTableText) then
+		HitTableText:SetText(TankStats.summaryText);
+	end
 end
 
 function TankStats:showHitTableText()	
 	HitTableText:SetText(TankStats.summaryText);
+	TankStats.showTableText = true;
 end
 
 function TankStats:hideHitTableText()
 	HitTableText:SetText("");
+	TankStats.showTableText = false;
 end
 
 
 function TankStats:stats()
     TankStats:HitTable_OnUpdate();
-
-
     
 	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
-	
-    if (TankStats.miss > 0) then DEFAULT_CHAT_FRAME:AddMessage("Miss: " .. format("%.2f", TankStats.miss) .. "%"); end
-    if (TankStats.dodge > 0) then DEFAULT_CHAT_FRAME:AddMessage("Dodge: " .. format("%.2f", TankStats.dodge) .. "%"); end
-    if (TankStats.parry > 0) then DEFAULT_CHAT_FRAME:AddMessage("Parry: " .. format("%.2f", TankStats.parry) .. "%"); end
-    if (TankStats.block > 0) then DEFAULT_CHAT_FRAME:AddMessage("Block: " .. format("%.2f", TankStats.block) .. "%"); end
+	local avoidance = TankStats.miss +TankStats.dodge +TankStats.parry
+	DEFAULT_CHAT_FRAME:AddMessage("Avoidance: " .. format("%.2f", avoidance ) .. "%");
+	DEFAULT_CHAT_FRAME:AddMessage("Avoidance + Block: " .. format("%.2f", avoidance + TankStats.block ) .. "%");
     if (TankStats.crit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crit: " .. format("%.2f", TankStats.crit) .. "%"); end
     if (TankStats.crush > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%"); end
-    if (TankStats.hit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Hit: " .. format("%.2f", TankStats.hit) .. "%"); end
 
 	
-    local id, texture, checkRelic = GetInventorySlotInfo("MainHandSlot");
-	local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(id);
-	DEFAULT_CHAT_FRAME:AddMessage("Offhand name: " .. id);
 end
 
 
