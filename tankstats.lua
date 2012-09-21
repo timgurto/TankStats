@@ -207,11 +207,9 @@ function TankStats:HitTable_OnUpdate()
 	if (link == nil) then
 		hasOH = false;
 		TankStats.block = 0;
-		DEFAULT_CHAT_FRAME:AddMessage("Link is nil");
 	else
 		local _,_, itemId = string.find(link, "item:(%d+):");
 		local _, _, _, _, _, sSubType, _ = GetItemInfo(itemId);
-		DEFAULT_CHAT_FRAME:AddMessage("Subtype: " .. sSubType);
 		if (sSubType ~="Shields") then
 			TankStats.block = 0;
 		end
