@@ -54,16 +54,17 @@ end);
 
 function TankStats:updateTargetLevel()
     TankStats.enemyLevel = UnitLevel("target");
+    TankStats.playerLevel = UnitLevel("player");
     
 	--0: nothing selected; use player
 	if (TankStats.enemyLevel == 0) then
-        TankStats.enemyLevel = UnitLevel("player")
+        TankStats.enemyLevel = TankStats.playerLevel
     end
 	
 	---1: skull; use 63
 	if (TankStats.enemyLevel == -1) then
-		TankStats.enemyLevel = min(63, UnitLevel("player") + 10);
-		--TankStats.enemyLevel = UnitLevel("player") + 3;
+		TankStats.enemyLevel = min(63, TankStats.playerLevel + 10);
+		--TankStats.enemyLevel = TankStats.playerLevel + 3;
 		--TankStats.enemyLevel = 63;
 	end
 end
@@ -89,7 +90,7 @@ function TankStats:EHBar_OnUpdate()
     TankStats:updateTargetLevel();
 
 	--Physical
-    local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor("player");
+    local _, effectiveArmor, _, _, _ = UnitArmor("player");
     local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel);
     local ACmultiplier = 1 / (1 - ACreduction);
     local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
@@ -108,7 +109,7 @@ function TankStats:EHBar_OnUpdate()
 
 	
 	--Fire EH
-    base, total, bonus, minus = UnitResistance("player", 2);
+    _, total, _, _ = UnitResistance("player", 2);
     local fireMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local fireEH, maxFireEH = health*fireMultiplier, maxHealth*fireMultiplier;
 	
@@ -120,7 +121,7 @@ function TankStats:EHBar_OnUpdate()
 							     formatEH(maxFireEH));
 							 
 	--Shadow EH
-    base, total, bonus, minus = UnitResistance("player", 5);
+    _, total, _, _ = UnitResistance("player", 5);
     local shadowMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local shadowEH, maxShadowEH = health*shadowMultiplier, maxHealth*shadowMultiplier;
 	
@@ -132,7 +133,7 @@ function TankStats:EHBar_OnUpdate()
 							       formatEH(maxShadowEH));
 							 
 	--Nature EH
-    base, total, bonus, minus = UnitResistance("player", 3);
+    _, total, _, _ = UnitResistance("player", 3);
     local natureMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local natureEH, maxNatureEH = health*natureMultiplier, maxHealth*natureMultiplier;
 	
@@ -144,7 +145,7 @@ function TankStats:EHBar_OnUpdate()
 								   formatEH(maxNatureEH));
 							 
 	--Frost EH
-    base, total, bonus, minus = UnitResistance("player", 4);
+    _, total, _, _ = UnitResistance("player", 4);
     local frostMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local frostEH, maxFrostEH = health*frostMultiplier, maxHealth*frostMultiplier;
 	
@@ -156,7 +157,7 @@ function TankStats:EHBar_OnUpdate()
 								   formatEH(maxFrostEH));
 							 
 	--Arcane EH
-    base, total, bonus, minus = UnitResistance("player", 6);
+    _, total, _, _ = UnitResistance("player", 6);
     local arcaneMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local arcaneEH, maxArcaneEH = health*arcaneMultiplier, maxHealth*arcaneMultiplier;
 	
@@ -188,9 +189,10 @@ function TankStats:EHBar_OnUpdate()
 end
 
 function TankStats:HitTable_OnUpdate()
+	TankStats.playerLevel = UnitLevel("player");
     TankStats:updateTargetLevel();
-    local baseDefense, armorDefense = UnitDefense("player");
-    local levelDiff = TankStats.enemyLevel - UnitLevel("player");
+    local baseDefense, _ = UnitDefense("player");
+    local levelDiff = TankStats.enemyLevel - TankStats.playerLevel;
 	local extraFromLevel = -0.04 * (TankStats.enemyLevel*5 - baseDefense);
     
 	
@@ -199,7 +201,6 @@ function TankStats:HitTable_OnUpdate()
     TankStats.dodge = GetDodgeChance() + extraFromLevel;
     TankStats.parry = GetParryChance() + extraFromLevel;
     TankStats.block = GetBlockChance() + extraFromLevel;
-	TankStats.crit = max(0, 5 - extraFromLevel);
 	
 	--ignore block?
 	local hasOH = true;
@@ -214,13 +215,20 @@ function TankStats:HitTable_OnUpdate()
 			TankStats.block = 0;
 		end
 	end
-	
 	--if (UnitCreatureType("target") == "Elemental") then
 	--	TankStats.block = 0;
 	--end
 
+	TankStats.crit = max(0, 5 - extraFromLevel);
 	
-	TankStats.crush = max(0, (TankStats.enemyLevel * 5 - min(baseDefense, 5*UnitLevel("player"))) * 2 - 15);
+	local baseDef = min(baseDefense, 5*TankStats.playerLevel);
+	local crushDif = TankStats.enemyLevel*5 - baseDef;
+	if (crushDif >= 15) then
+		TankStats.crush = crushDif * 2 - 15;
+	else
+		TankStats.crush = 0;
+	end
+
 	
 	
 	TankStats.miss  = min(TankStats.miss,  100);
@@ -238,9 +246,9 @@ function TankStats:HitTable_OnUpdate()
 	if (TankStats.dodge > 0) then HitTableDodgeBarText:SetText("D"); else HitTableDodgeBarText:SetText(""); end
 	if (TankStats.parry > 0) then HitTableParryBarText:SetText("P"); else HitTableParryBarText:SetText(""); end
 	if (TankStats.block > 0) then HitTableBlockBarText:SetText("B"); else HitTableBlockBarText:SetText(""); end
-	if (TankStats.crit > 0) then HitTableCritBarText:SetText("C"); else HitTableCritBarText:SetText(""); end
-	if (TankStats.crush > 0) then HitTableCrushBarText:SetText("Cu"); else HitTableCrushBarText:SetText(""); end
-	if (TankStats.hit > 0) then HitTableHitBarText:SetText("H"); else HitTableHitBarText:SetText(""); end
+	if (TankStats.crit > 0) then HitTableCritBarText:SetText("Crit"); else HitTableCritBarText:SetText(""); end
+	if (TankStats.crush > 0) then HitTableCrushBarText:SetText("Crush"); else HitTableCrushBarText:SetText(""); end
+	if (TankStats.hit > 0) then HitTableHitBarText:SetText("Hit"); else HitTableHitBarText:SetText(""); end
 	
 	--zero-size messes up anchors
 	local missSize = max(0.01, TankStats.miss);

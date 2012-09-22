@@ -226,7 +226,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="M">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -246,7 +246,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="D">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -266,7 +266,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="P">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -286,7 +286,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="B">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -306,7 +306,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="Ct">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -326,7 +326,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="Cu">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -346,7 +346,7 @@
                     <Layer level="OVERLAY">
                         <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" text="H">
                             <Anchors>
-                                <Anchor point="LEFT"/>
+                                <Anchor point="CENTER"/>
                             </Anchors>
                         </FontString>
                     </Layer>
