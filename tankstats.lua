@@ -254,7 +254,6 @@ function TankStats:HitTable_OnUpdate()
     
 	
     TankStats.miss = max(0, 5 + extraFromLevel);
-	DEFAULT_CHAT_FRAME:AddMessage("Extra to def stats: " .. extraFromLevel);
     
     TankStats.dodge = max(0, GetDodgeChance() + extraFromLevel);
     TankStats.parry = max(0, GetParryChance() + extraFromLevel);
@@ -288,8 +287,6 @@ function TankStats:HitTable_OnUpdate()
 		TankStats.crush = 0;
 	end
 	TankStats.crush = max(0, min(100, TankStats.crush));
-
-	DEFAULT_CHAT_FRAME:AddMessage("Raw crushing: " .. TankStats.crush);
 	
     TankStats.miss  = min(TankStats.miss,  100.0);  -- MISS/DODGE/PARRY/ASF MIN 0
 	TankStats.dodge = min(TankStats.dodge, 100.0 - TankStats.miss);
@@ -297,10 +294,7 @@ function TankStats:HitTable_OnUpdate()
 	TankStats.block = min(TankStats.block, 100.0 - TankStats.miss - TankStats.dodge - TankStats.parry);
 	TankStats.crit  = min(TankStats.crit , 100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block);
 	TankStats.crush = min(TankStats.crush, 100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit);
-	DEFAULT_CHAT_FRAME:AddMessage("crush = min(" .. format("%.2f", TankStats.crush) .. ", " .. format("%.2f", 100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit));
 	TankStats.hit   =                      100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit - TankStats.crush;
-	
-	DEFAULT_CHAT_FRAME:AddMessage("Total table size: " .. format("%.2f", TankStats.miss + TankStats.dodge + TankStats.parry + TankStats.block + TankStats.crit + TankStats.crush + TankStats.hit));
 	
 	
 	local barSize = HitTable:GetWidth() * .01;
