@@ -51,6 +51,12 @@ EventFrame:SetScript("OnEvent", function(self,event,...)
 	TankStats:HitTable_OnUpdate();
 end);
 
+EventFrame:RegisterEvent("PLAYER_AURAS_CHANGED")
+EventFrame:SetScript("OnEvent", function(self,event,...) 
+    TankStats:EHBar_OnUpdate();
+	TankStats:HitTable_OnUpdate();
+end);
+
 
 function TankStats:updateTargetLevel()
     TankStats.enemyLevel = UnitLevel("target");
