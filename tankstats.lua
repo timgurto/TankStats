@@ -88,6 +88,10 @@ end
 
 function TankStats:EHBar_OnUpdate()
     TankStats:updateTargetLevel();
+	
+	local EHHeight = 30;
+	local unusedHeight = .001;
+	local MEHHeight = 20
 
 	--Physical
     local _, effectiveArmor, _, _, _ = UnitArmor("player");
@@ -96,6 +100,8 @@ function TankStats:EHBar_OnUpdate()
     local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
     local EH, maxEH = health*ACmultiplier, maxHealth*ACmultiplier;
 	
+	EHFrameEHBar:SetHeight(EHHeight);
+	EHFrameMaxEHBar:SetHeight(EHHeight);
     EHFrameEHBar:SetMinMaxValues(0, maxEH);
     EHFrameEHBar:SetValue(EH);
     EHFrameEHBarText:SetText("Physical: " ..
@@ -106,69 +112,104 @@ function TankStats:EHBar_OnUpdate()
 	--Resists
     local maxResist = TankStats.enemyLevel * 5;
 	local base, total, bonus, minus, modWidth;
-
+	
 	
 	--Fire EH
     _, total, _, _ = UnitResistance("player", 2);
     local fireMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local fireEH, maxFireEH = health*fireMultiplier, maxHealth*fireMultiplier;
-	
-    EHFrameFireEHBar:SetMinMaxValues(0, maxFireEH);
-    EHFrameFireEHBar:SetValue(fireEH);
-    EHFrameFireEHBarText:SetText("Fire: " ..
-	                             formatEH(fireEH) ..
-	                             " / " ..
-							     formatEH(maxFireEH));
+	if (maxFireEH == maxHealth) then
+		EHFrameFireEHBar:SetHeight(unusedHeight);
+		EHFrameMaxFireEHBar:SetHeight(unusedHeight);
+		EHFrameFireEHBarText:SetText("");
+	else
+		EHFrameFireEHBar:SetHeight(MEHHeight);
+		EHFrameMaxFireEHBar:SetHeight(MEHHeight);
+		EHFrameFireEHBar:SetMinMaxValues(0, maxFireEH);
+		EHFrameFireEHBar:SetValue(fireEH);
+		EHFrameFireEHBarText:SetText("Fire: " ..
+									 formatEH(fireEH) ..
+									 " / " ..
+									 formatEH(maxFireEH));
+	end
 							 
 	--Shadow EH
     _, total, _, _ = UnitResistance("player", 5);
     local shadowMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local shadowEH, maxShadowEH = health*shadowMultiplier, maxHealth*shadowMultiplier;
-	
-    EHFrameShadowEHBar:SetMinMaxValues(0, maxShadowEH);
-    EHFrameShadowEHBar:SetValue(shadowEH);
-    EHFrameShadowEHBarText:SetText("Shadow: " ..
-	                               formatEH(shadowEH) ..
-								   " / " ..
-							       formatEH(maxShadowEH));
+	if (maxShadowEH == maxHealth) then
+		EHFrameShadowEHBar:SetHeight(unusedHeight);
+		EHFrameMaxShadowEHBar:SetHeight(unusedHeight);
+		EHFrameShadowEHBarText:SetText("");
+	else
+		EHFrameShadowEHBar:SetHeight(MEHHeight);
+		EHFrameMaxShadowEHBar:SetHeight(MEHHeight);
+		EHFrameShadowEHBar:SetMinMaxValues(0, maxShadowEH);
+		EHFrameShadowEHBar:SetValue(shadowEH);
+		EHFrameShadowEHBarText:SetText("Shadow: " ..
+									   formatEH(shadowEH) ..
+									   " / " ..
+									   formatEH(maxShadowEH));
+	end
 							 
 	--Nature EH
     _, total, _, _ = UnitResistance("player", 3);
     local natureMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local natureEH, maxNatureEH = health*natureMultiplier, maxHealth*natureMultiplier;
-	
-    EHFrameNatureEHBar:SetMinMaxValues(0, maxNatureEH);
-    EHFrameNatureEHBar:SetValue(natureEH);
-    EHFrameNatureEHBarText:SetText("Nature: " ..
-	                               formatEH(natureEH) ..
-								   " / " ..
-								   formatEH(maxNatureEH));
+	if (maxNatureEH == maxHealth) then
+		EHFrameNatureEHBar:SetHeight(unusedHeight);
+		EHFrameMaxNatureEHBar:SetHeight(unusedHeight);
+		EHFrameNatureEHBarText:SetText("");
+	else
+		EHFrameNatureEHBar:SetHeight(MEHHeight);
+		EHFrameMaxNatureEHBar:SetHeight(MEHHeight);
+		EHFrameNatureEHBar:SetMinMaxValues(0, maxNatureEH);
+		EHFrameNatureEHBar:SetValue(natureEH);
+		EHFrameNatureEHBarText:SetText("Nature: " ..
+									   formatEH(natureEH) ..
+									   " / " ..
+									   formatEH(maxNatureEH));
+	end
 							 
 	--Frost EH
     _, total, _, _ = UnitResistance("player", 4);
     local frostMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local frostEH, maxFrostEH = health*frostMultiplier, maxHealth*frostMultiplier;
+	if (maxFrostEH == maxHealth) then
+		EHFrameFrostEHBar:SetHeight(unusedHeight);
+		EHFrameMaxFrostEHBar:SetHeight(unusedHeight);
+		EHFrameFrostEHBarText:SetText("");
+	else
+		EHFrameFrostEHBar:SetHeight(MEHHeight);
+		EHFrameMaxFrostEHBar:SetHeight(MEHHeight);
+		EHFrameFrostEHBar:SetMinMaxValues(0, maxFrostEH);
+		EHFrameFrostEHBar:SetValue(frostEH);
+		EHFrameFrostEHBarText:SetText("Frost: " ..
+									   formatEH(frostEH) ..
+									   " / " ..
+									   formatEH(maxFrostEH));
+	end
 	
-    EHFrameFrostEHBar:SetMinMaxValues(0, maxFrostEH);
-    EHFrameFrostEHBar:SetValue(frostEH);
-    EHFrameFrostEHBarText:SetText("Frost: " ..
-	                               formatEH(frostEH) ..
-								   " / " ..
-								   formatEH(maxFrostEH));
-							 
 	--Arcane EH
     _, total, _, _ = UnitResistance("player", 6);
     local arcaneMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local arcaneEH, maxArcaneEH = health*arcaneMultiplier, maxHealth*arcaneMultiplier;
-	
-    EHFrameArcaneEHBar:SetMinMaxValues(0, maxArcaneEH);
-    EHFrameArcaneEHBar:SetValue(arcaneEH);
-    EHFrameArcaneEHBarText:SetText("Arcane: " ..
-	                               formatEH(arcaneEH) ..
-								   " / " ..
-								   formatEH(maxArcaneEH));
+	if (maxArcaneEH == maxHealth) then
+		EHFrameArcaneEHBar:SetHeight(unusedHeight);
+		EHFrameMaxArcaneEHBar:SetHeight(unusedHeight);
+		EHFrameArcaneEHBarText:SetText("");
+	else
+		EHFrameArcaneEHBar:SetHeight(MEHHeight);
+		EHFrameMaxArcaneEHBar:SetHeight(MEHHeight);
+		EHFrameArcaneEHBar:SetMinMaxValues(0, maxArcaneEH);
+		EHFrameArcaneEHBar:SetValue(arcaneEH);
+		EHFrameArcaneEHBarText:SetText("Arcane: " ..
+									   formatEH(arcaneEH) ..
+									   " / " ..
+									   formatEH(maxArcaneEH));
+	end
 							 
-
+							 
 	--Normalize bar widths
 	local maxMax = max(maxEH, maxFireEH, maxShadowEH, maxNatureEH, maxFrostEH, maxArcaneEH);
 	local widthModifier = EHFrame:GetWidth() / maxMax;
@@ -185,6 +226,22 @@ function TankStats:EHBar_OnUpdate()
 	EHFrameFrostEHBar:SetWidth(maxFrostEH * widthModifier);
 	EHFrameMaxArcaneEHBar:SetWidth(maxArcaneEH * widthModifier);
 	EHFrameArcaneEHBar:SetWidth(maxArcaneEH * widthModifier);
+							 
+
+	--hide unnecessary bars
+	local unusedHeight = 0.01;
+
+	
+
+
+		
+		
+
+		
+		
+
+		
+		
 	
 end
 
@@ -251,13 +308,13 @@ function TankStats:HitTable_OnUpdate()
 	if (TankStats.hit > 0) then HitTableHitBarText:SetText("Hit"); else HitTableHitBarText:SetText(""); end
 	
 	--zero-size messes up anchors
-	local missSize = max(0.01, TankStats.miss);
-	local dodgeSize = max(0.01, TankStats.dodge);
-	local parrySize = max(0.01, TankStats.parry);
-	local blockSize = max(0.01, TankStats.block);
-	local critSize = max(0.01, TankStats.crit);
-	local crushSize = max(0.01, TankStats.crush);
-	local hitSize = max(0.01, TankStats.hit);
+	local missSize = max(0.001, TankStats.miss);
+	local dodgeSize = max(0.001, TankStats.dodge);
+	local parrySize = max(0.001, TankStats.parry);
+	local blockSize = max(0.001, TankStats.block);
+	local critSize = max(0.001, TankStats.crit);
+	local crushSize = max(0.001, TankStats.crush);
+	local hitSize = max(0.001, TankStats.hit);
 	
 	HitTableMissBar:SetWidth(missSize * barSize);
 	HitTableDodgeBar:SetWidth(dodgeSize * barSize);
