@@ -118,13 +118,14 @@ function TankStats:EHBar_OnUpdate()
 	--Resists
     local maxResist = TankStats.enemyLevel * 5;
 	local base, total, bonus, minus, modWidth;
+	local resistThreshold = 1; --below this level of resistance, the MEH bar is hidden
 	
 	
 	--Fire EH
     _, total, _, _ = UnitResistance("player", 2);
     local fireMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local fireEH, maxFireEH = health*fireMultiplier, maxHealth*fireMultiplier;
-	if (maxFireEH == maxHealth) then
+	if (total < resistThreshold) then
 		EHFrameFireEHBar:SetHeight(unusedHeight);
 		EHFrameMaxFireEHBar:SetHeight(unusedHeight);
 		EHFrameFireEHBarText:SetText("");
@@ -143,7 +144,7 @@ function TankStats:EHBar_OnUpdate()
     _, total, _, _ = UnitResistance("player", 5);
     local shadowMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local shadowEH, maxShadowEH = health*shadowMultiplier, maxHealth*shadowMultiplier;
-	if (maxShadowEH == maxHealth) then
+	if (total < resistThreshold) then
 		EHFrameShadowEHBar:SetHeight(unusedHeight);
 		EHFrameMaxShadowEHBar:SetHeight(unusedHeight);
 		EHFrameShadowEHBarText:SetText("");
@@ -162,7 +163,7 @@ function TankStats:EHBar_OnUpdate()
     _, total, _, _ = UnitResistance("player", 3);
     local natureMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local natureEH, maxNatureEH = health*natureMultiplier, maxHealth*natureMultiplier;
-	if (maxNatureEH == maxHealth) then
+	if (total < resistThreshold) then
 		EHFrameNatureEHBar:SetHeight(unusedHeight);
 		EHFrameMaxNatureEHBar:SetHeight(unusedHeight);
 		EHFrameNatureEHBarText:SetText("");
@@ -181,7 +182,7 @@ function TankStats:EHBar_OnUpdate()
     _, total, _, _ = UnitResistance("player", 4);
     local frostMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local frostEH, maxFrostEH = health*frostMultiplier, maxHealth*frostMultiplier;
-	if (maxFrostEH == maxHealth) then
+	if (total < resistThreshold) then
 		EHFrameFrostEHBar:SetHeight(unusedHeight);
 		EHFrameMaxFrostEHBar:SetHeight(unusedHeight);
 		EHFrameFrostEHBarText:SetText("");
@@ -200,7 +201,7 @@ function TankStats:EHBar_OnUpdate()
     _, total, _, _ = UnitResistance("player", 6);
     local arcaneMultiplier = 1 / (1 - (min(total / maxResist, 1)) * .75);
     local arcaneEH, maxArcaneEH = health*arcaneMultiplier, maxHealth*arcaneMultiplier;
-	if (maxArcaneEH == maxHealth) then
+	if (total < resistThreshold) then
 		EHFrameArcaneEHBar:SetHeight(unusedHeight);
 		EHFrameMaxArcaneEHBar:SetHeight(unusedHeight);
 		EHFrameArcaneEHBarText:SetText("");
@@ -355,6 +356,41 @@ function TankStats:hideHitTableText()
 	TankStats.showTableText = false;
 end
 
+function CT_GetBuffName(unit, i, filt)
+	CT_UsingTooltip = 1;
+	local filter;
+	if ( not filt ) then
+		filter = "HELPFUL|HARMFUL";
+	else
+		filter = filt;
+	end
+	local buffIndex, untilCancelled = GetPlayerBuff(i, filter);
+	local buff;
+
+	if ( buffIndex < 24 ) then
+		buff = buffIndex;
+		if (buff == -1) then
+			buff = nil;
+		end
+	end
+
+	if (buff) then
+		local tooltip = BTooltip;
+		if (unit == "player" and tooltip ) then
+			tooltip:SetPlayerBuff(buffIndex);
+		end
+		local tooltiptext = getglobal("BTooltipTextLeft1");
+		if ( tooltiptext ) then
+			local name = tooltiptext:GetText();
+			if ( name ~= nil ) then
+				CT_UsingTooltip = 0;
+				return name;
+			end
+		end
+	end
+	CT_UsingTooltip = 0;
+	return nil;
+end
 
 function TankStats:stats()
     TankStats:HitTable_OnUpdate();
@@ -366,6 +402,17 @@ function TankStats:stats()
     if (TankStats.crit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crit: " .. format("%.2f", TankStats.crit) .. "%"); end
     if (TankStats.crush > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%"); end
 
+	
+
+	for i=1,40 do
+		if (i) then
+			DEFAULT_CHAT_FRAME:AddMessage(i .. ": " .. CT_GetBuffName("player", i));
+		end
+		
+		
+	end
+	
+	
 	
 end
 
