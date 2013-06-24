@@ -255,13 +255,15 @@ end
 function TankStats:HitTable_OnUpdate()
 	TankStats.playerLevel = UnitLevel("player");
     TankStats:updateTargetLevel();
-    local baseDefense, armorDefense = UnitDefense("player");
+	local armorDefense;
+	TankStats.baseDefense, armorDefense = UnitDefense("player");
     local levelDiff = TankStats.enemyLevel - TankStats.playerLevel;
-	local extraFromLevel = -0.04 * (TankStats.enemyLevel*5 - baseDefense);
+	local extraFromLevel = -0.04 * (levelDiff * 5);
+	local extraFromBaseDef = -0.04 * (TankStats.enemyLevel*5 - TankStats.baseDefense);
 	local extraFromGear = 0.04 * armorDefense;
     
 	
-    TankStats.miss = max(0, 5 + extraFromLevel + extraFromGear);
+    TankStats.miss = max(0, 5 + extraFromBaseDef + extraFromGear);
     
 	--Get*Chance() should already include defense from gear.
     TankStats.dodge = max(0, GetDodgeChance() + extraFromLevel);
@@ -288,7 +290,7 @@ function TankStats:HitTable_OnUpdate()
 	TankStats.crit = max(0, 5 - extraFromLevel - extraFromGear);
 	TankStats.crit = min(100, TankStats.crit);
 	
-	local baseDef = min(baseDefense, 5*TankStats.playerLevel);
+	local baseDef = min(TankStats.baseDefense, 5*TankStats.playerLevel);
 	local crushDif = TankStats.enemyLevel*5 - baseDef;
 	if (crushDif >= 15) then
 		TankStats.crush = crushDif * 2 - 15;
@@ -398,6 +400,7 @@ function TankStats:stats()
     TankStats:HitTable_OnUpdate();
     
 	DEFAULT_CHAT_FRAME:AddMessage("Target level: " .. TankStats.enemyLevel);
+	
 	local avoidance = TankStats.miss +TankStats.dodge +TankStats.parry
 	DEFAULT_CHAT_FRAME:AddMessage("Avoidance: " .. format("%.2f", avoidance ) .. "%");
 	DEFAULT_CHAT_FRAME:AddMessage("Avoidance + Block: " .. format("%.2f", avoidance + TankStats.block ) .. "%");
