@@ -255,13 +255,15 @@ end
 function TankStats:HitTable_OnUpdate()
 	TankStats.playerLevel = UnitLevel("player");
     TankStats:updateTargetLevel();
-    local baseDefense, _ = UnitDefense("player");
+    local baseDefense, armorDefense = UnitDefense("player");
     local levelDiff = TankStats.enemyLevel - TankStats.playerLevel;
 	local extraFromLevel = -0.04 * (TankStats.enemyLevel*5 - baseDefense);
+	local extraFromGear = 0.04 * armorDefense;
     
 	
-    TankStats.miss = max(0, 5 + extraFromLevel);
+    TankStats.miss = max(0, 5 + extraFromLevel + extraFromGear);
     
+	--Get*Chance() should already include defense from gear.
     TankStats.dodge = max(0, GetDodgeChance() + extraFromLevel);
     TankStats.parry = max(0, GetParryChance() + extraFromLevel);
     TankStats.block = max(0, GetBlockChance() + extraFromLevel);
@@ -283,7 +285,7 @@ function TankStats:HitTable_OnUpdate()
 	--	TankStats.block = 0;
 	--end
 
-	TankStats.crit = max(0, 5 - extraFromLevel);
+	TankStats.crit = max(0, 5 - extraFromLevel - extraFromGear);
 	TankStats.crit = min(100, TankStats.crit);
 	
 	local baseDef = min(baseDefense, 5*TankStats.playerLevel);
