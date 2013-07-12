@@ -101,7 +101,7 @@ function TankStats:EHBar_OnUpdate()
 
     --Physical
     local _, effectiveArmor, _, _, _ = UnitArmor("player");
-    local ACreduction = effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel);
+    local ACreduction = min(0.75, effectiveArmor / (effectiveArmor + 400 + 85 * TankStats.enemyLevel));
     local ACmultiplier = 1 / (1 - ACreduction);
     local health, maxHealth = UnitHealth("player"), UnitHealthMax("player");
     local EH, maxEH = health*ACmultiplier, maxHealth*ACmultiplier;
