@@ -118,7 +118,7 @@ function TankStats:EHBar_OnUpdate()
     --Resists
     local maxResist = TankStats.enemyLevel * 5;
     local base, total, bonus, minus, modWidth;
-    local resistThreshold = 1; --below this level of resistance, the MEH bar is hidden
+    local resistThreshold = 50; --below this level of resistance, the MEH bar is hidden
     
     
     --Fire EH
