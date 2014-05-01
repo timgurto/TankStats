@@ -92,6 +92,7 @@ local function formatEH(x)
     return format("%.3fk", x/1000);
 end
 
+resistThreshold = 50; --below this level of resistance, the MEH bar is hidden
 function TankStats:EHBar_OnUpdate()
     TankStats:updateTargetLevel();
 
@@ -112,7 +113,7 @@ function TankStats:EHBar_OnUpdate()
     --Resists
     local maxResist = TankStats.enemyLevel * 5;
     local base, total, bonus, minus, modWidth;
-    local resistThreshold = 11; --below this level of resistance, the MEH bar is hidden
+    
     
     
     --Fire EH
@@ -379,21 +380,41 @@ local function toggleHitTable()
 	end
 end
 
+local function setResistThreshold(param) 
+	resistThreshold = tonumber(param);
+	if (not resistThreshold) then
+		DEFAULT_CHAT_FRAME:AddMessage('the parameter was not a number.')
+		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats resTh <number> to set the resistance threshold, at which the EH is shown.')
+	else 
+		TankStats:EHBar_OnUpdate()
+	end
+end
 
 SLASH_TANKSTATS1 = "/tankstats";
 
 local function handler(msg, editbox)
- if msg == 'stats' then
+ -- Any leading non-whitespace is captured into command;
+ -- the rest (minus leading whitespace) is captured into rest.
+
+	local i,j, command, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
+	if (not command) then command = string.lower(msg) end
+	if (not command) then command = "" end
+	if (not param) then param = "" end
+
+ if command == 'stats' then
   TankStats:stats()	
- elseif msg == 'EhBar' then
+ elseif command == 'ehbar' then
  toggleEHBar()
- elseif msg == 'MEhBars' then
+ elseif command == 'mehbars' then
    toggleMEhBars()
- elseif msg == 'HitTable' then
+ elseif command == 'hittable' then
   toggleHitTable()
+ elseif command == 'resth' then
+	setResistThreshold(param)
  else
  DEFAULT_CHAT_FRAME:AddMessage('unknown tankstats command.')
  DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats [EhBar | MEhBars | HitTable] to toggle visibility')
+DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats resTh to set the resistance threshold, at which the EH is shown.')
  DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats stats to get a stat summary')
  end
 end
