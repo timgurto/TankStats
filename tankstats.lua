@@ -336,8 +336,8 @@ function TankStats:stats()
     local avoidance = TankStats.miss +TankStats.dodge +TankStats.parry
     DEFAULT_CHAT_FRAME:AddMessage("Avoidance: " .. format("%.2f", avoidance ) .. "%");
     DEFAULT_CHAT_FRAME:AddMessage("Avoidance + Block: " .. format("%.2f", avoidance + TankStats.block ) .. "%");
-    if (TankStats.crit > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crit: " .. format("%.2f", TankStats.crit) .. "%"); end
-    if (TankStats.crush > 0) then DEFAULT_CHAT_FRAME:AddMessage("Crush: " .. format("%.2f", TankStats.crush) .. "%"); end
+    if (TankStats.crit > 0) then DEFAULT_CHAT_FRAME:AddMessage("incoming Crit: " .. format("%.2f", TankStats.crit) .. "%"); end
+    if (TankStats.crush > 0) then DEFAULT_CHAT_FRAME:AddMessage("incoming Crush: " .. format("%.2f", TankStats.crush) .. "%"); end
 end
 
 local function toggleEHBar()
@@ -401,22 +401,22 @@ local function handler(msg, editbox)
 	if (not command) then command = "" end
 	if (not param) then param = "" end
 
- if command == 'stats' then
-  TankStats:stats()	
- elseif command == 'ehbar' then
- toggleEHBar()
- elseif command == 'mehbars' then
-   toggleMEhBars()
- elseif command == 'hittable' then
-  toggleHitTable()
- elseif command == 'resth' then
-	setResistThreshold(param)
- else
- DEFAULT_CHAT_FRAME:AddMessage('unknown tankstats command.')
- DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats [EhBar | MEhBars | HitTable] to toggle visibility')
-DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats resTh to set the resistance threshold, at which the EH is shown.')
- DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats stats to get a stat summary')
- end
+	if command == 'stats' then
+		TankStats:stats()	
+	elseif command == 'ehbar' then
+		toggleEHBar()
+	elseif command == 'mehbars' then
+		toggleMEhBars()
+	elseif command == 'hittable' then
+		toggleHitTable()
+	elseif command == 'resth' then
+		setResistThreshold(param)
+	else
+		DEFAULT_CHAT_FRAME:AddMessage('unknown tankstats command.')
+		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats [EhBar | MEhBars | HitTable] to toggle visibility')
+		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats resTh <number> to set the resistance threshold, at which the EH is shown.')
+		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats stats to get a stat summary')
+	end
 end
 
 SlashCmdList["TANKSTATS"] = handler;
