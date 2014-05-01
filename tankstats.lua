@@ -62,16 +62,15 @@ function TankStats:updateTargetLevel()
     TankStats.enemyLevel = UnitLevel("target");
     TankStats.playerLevel = UnitLevel("player");
     
-    --0: nothing selected; use player
+    -- 0: nothing selected; use player
     if (TankStats.enemyLevel == 0) then
         TankStats.enemyLevel = TankStats.playerLevel
     end
     
-    ---1: skull; use 63
+    -- -1: skull; use 63
     if (TankStats.enemyLevel == -1) then
         TankStats.enemyLevel = min(63, TankStats.playerLevel + 10);
-        --TankStats.enemyLevel = TankStats.playerLevel + 3;
-        --TankStats.enemyLevel = 63;
+
     end
 end
 
@@ -245,10 +244,9 @@ function TankStats:HitTable_OnUpdate()
     TankStats.block = max(0, GetBlockChance() + extraFromLevel);
     
     --ignore block?
-    local hasOH = true;
     local link = GetInventoryItemLink("player", 17);
-    if (link == nil) then
-        hasOH = false;
+    if (not link) then 
+		-- no offhand equiped
         TankStats.block = 0;
     else
         local _,_, itemId = string.find(link, "item:(%d+):");
@@ -261,17 +259,15 @@ function TankStats:HitTable_OnUpdate()
     --    TankStats.block = 0;
     --end
 
-    TankStats.crit = max(0, 5 - extraFromLevel - extraFromGear);
-    TankStats.crit = min(100, TankStats.crit);
+    TankStats.crit = min(100, max(0, 5 - extraFromLevel - extraFromGear));
     
     local baseDef = min(TankStats.baseDefense, 5*TankStats.playerLevel);
     local crushDif = TankStats.enemyLevel*5 - baseDef;
     if (crushDif >= 15) then
-        TankStats.crush = crushDif * 2 - 15;
+        TankStats.crush = max(0, min(100, crushDif * 2 - 15));
     else
         TankStats.crush = 0;
     end
-    TankStats.crush = max(0, min(100, TankStats.crush));
     
     TankStats.miss  = min(TankStats.miss,  100.0);  -- MISS/DODGE/PARRY/ASF MIN 0
     TankStats.dodge = min(TankStats.dodge, 100.0 - TankStats.miss);
@@ -409,12 +405,16 @@ local function handler(msg, editbox)
 		toggleMEhBars()
 	elseif command == 'hittable' then
 		toggleHitTable()
+	elseif command == 'all' then
+		toggleEHBar()
+		toggleMEhBars()
+		toggleHitTable()
 	elseif command == 'resth' then
 		setResistThreshold(param)
 	else
 		DEFAULT_CHAT_FRAME:AddMessage('unknown tankstats command.')
-		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats [EhBar | MEhBars | HitTable] to toggle visibility')
-		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats resTh <number> to set the resistance threshold, at which the EH is shown.')
+		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats [EhBar | MEhBars | HitTable | All] to toggle visibility')
+		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats resTh <number> to set the resistance threshold, at which the MEH is shown.')
 		DEFAULT_CHAT_FRAME:AddMessage('Use /tanktstats stats to get a stat summary')
 	end
 end
