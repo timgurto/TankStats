@@ -229,7 +229,7 @@ function TankStats:HitTable_OnUpdate()
     TankStats.playerLevel = UnitLevel("player");
     TankStats:updateTargetLevel();
     local armorDefense;
-    TankStats.baseDefense, armorDefense = UnitDefense("player");
+    TankStats.baseDefense, armorDefense = UnitDefense("player");	
     local levelDiff = TankStats.enemyLevel - TankStats.playerLevel;
     local extraFromLevel = -0.04 * (levelDiff * 5);
     local extraFromBaseDef = -0.04 * (TankStats.enemyLevel*5 - TankStats.baseDefense);
@@ -259,8 +259,8 @@ function TankStats:HitTable_OnUpdate()
     --    TankStats.block = 0;
     --end
 
-    TankStats.crit = min(100, max(0, 5 - extraFromLevel - extraFromGear));
-    
+    TankStats.crit = min(100, max(0, 5 - extraFromLevel - extraFromGear - extraFromBaseDef));
+
     local baseDef = min(TankStats.baseDefense, 5*TankStats.playerLevel);
     local crushDif = TankStats.enemyLevel*5 - baseDef;
     if (crushDif >= 15) then
@@ -276,7 +276,6 @@ function TankStats:HitTable_OnUpdate()
     TankStats.crit  = min(TankStats.crit , 100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block);
     TankStats.crush = min(TankStats.crush, 100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit);
     TankStats.hit   =                      100.0 - TankStats.miss - TankStats.dodge - TankStats.parry - TankStats.block - TankStats.crit - TankStats.crush;
-    
     
     local barSize = HitTable:GetWidth() * .01;
     
@@ -420,13 +419,3 @@ local function handler(msg, editbox)
 end
 
 SlashCmdList["TANKSTATS"] = handler;
-
-
-
-
-
-
-
-
-
-
